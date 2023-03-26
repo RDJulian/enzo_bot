@@ -10,12 +10,13 @@ MESSAGE_FIRST_HALF = f'El "Dia del Accidente" es cuando a <@{ORURA_ID}> le da o 
                      'semi-borra usuarios del server porque esta enojada/triste/retrasada mental.\n\nActualmente ' \
                      'pasaron **'
 
-MESSAGE_SECOND_HALF = f'** día(s) desde el último accidente.'
+MESSAGE_SECOND_HALF = f"** día(s) desde el último accidente."
 
-COMMAND_PREFIX = '!'
+COMMAND_PREFIX = "!"
 
-IMAGE_PATH = 'sirius_black.png'
+IMAGE_PATH = "sirius_black.png"
+BINARY_FILE_PATH = "counterInfo.dat"
 
-COGS = ["cogs.MessageUpdaterCog", "cogs.OnReadyCog", "cogs.OnMessageCog", "cogs.ResetCommandCog"]
+COGS = ["cogs.MessageUpdaterCog", "cogs.OnReadyCog", "cogs.OnMessageCog", "cogs.OnMessageDeleteCog"]
 
 SEARCH_LIMIT = 1

@@ -19,6 +19,7 @@ TOKEN = os.getenv('TOKEN')
 
 intents = discord.Intents.default()
 intents.message_content = True
+intents.messages = True
 enzoBot = commands.Bot(intents=intents, command_prefix=COMMAND_PREFIX)
 
 asyncio.run(loadCogs(enzoBot))
