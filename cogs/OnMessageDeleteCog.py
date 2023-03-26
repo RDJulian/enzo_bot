@@ -10,14 +10,16 @@ class OnMessageDeleteCog(commands.Cog):
     @commands.Cog.listener(name="on_message_delete")
     async def onMessageDelete(self, message: discord.Message) -> None:
         """
-        Restores Enzo's message if its deleted.
+        Restores Enzo's message if it was deleted.
+        TODO: Search if it's possible to reuse the attached image. It would make this command more generic.
+            Also consider if injecting dependency would be better.
         """
         if message.author.id == ENZO_BOT_ID and message.channel.id == CHANNEL_ID:
-            await self.bot.get_channel(CHANNEL_ID).send(content=message.content,
-                                                        file=discord.File(IMAGE_PATH))
+            await self.bot.get_channel(message.channel.id).send(content=message.content,
+                                                                file=discord.File(IMAGE_PATH))
 
 
-async def setup(bot: commands.Bot):
+async def setup(bot: commands.Bot) -> None:
     """
     Initializes and adds Cog to Bot.
     """

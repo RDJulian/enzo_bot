@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+from constants import *
 
 
 class OnReadyCog(commands.Cog):
@@ -9,12 +10,12 @@ class OnReadyCog(commands.Cog):
     @commands.Cog.listener(name="on_ready")
     async def onReady(self) -> None:
         """
-        Changes game activity to desired name.
+        Changes game activity to the desired ACTIVITY_NAME.
         """
-        await self.bot.change_presence(activity=discord.Game(name="el Pepe"))
+        await self.bot.change_presence(activity=discord.Game(name=ACTIVITY_NAME))
 
 
-async def setup(bot: commands.Bot):
+async def setup(bot: commands.Bot) -> None:
     """
     Initializes and adds Cog to Bot.
     """
