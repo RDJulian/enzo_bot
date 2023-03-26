@@ -6,10 +6,16 @@ INITIAL_MESSAGE = f'El "Dia del Accidente" es cuando a <@{ORURA_ID}> le da o se 
                   'semi-borra usuarios del server porque esta enojada/triste/retrasada mental.\n\nActualmente ' \
                   'pasaron **0** día(s) desde el último accidente.'
 
-INDEX_DAYS = 26
-INDEX_NEW_LINE = 23
-SPLIT = 24
+MESSAGE_FIRST_HALF = f'El "Dia del Accidente" es cuando a <@{ORURA_ID}> le da o se pelea con alguien y ' \
+                     'semi-borra usuarios del server porque esta enojada/triste/retrasada mental.\n\nActualmente ' \
+                     'pasaron **'
+
+MESSAGE_SECOND_HALF = f'** día(s) desde el último accidente.'
 
 COMMAND_PREFIX = '!'
 
 IMAGE_PATH = 'sirius_black.png'
+
+COGS = ["cogs.MessageUpdaterCog", "cogs.OnReadyCog", "cogs.OnMessageCog", "cogs.ResetCommandCog"]
+
+SEARCH_LIMIT = 1
