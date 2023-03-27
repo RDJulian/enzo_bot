@@ -6,6 +6,17 @@ from binaryFileHandler import loadBinaryFile, saveToBinaryFile
 from constants import *
 
 
+def isValidDayInput(days: str) -> bool:
+    """
+    Returns True if the input text is valid i.e. can be cast to int and greater or equal to zero. False otherwise.
+    """
+    try:
+        days = int(days)
+        return days >= 0
+    except ValueError:
+        return False
+
+
 async def getFirstEnzoMessage(channel: discord.TextChannel) -> discord.Message | None:
     """
     Returns the first message from the desired channel if it is from Enzo. Otherwise, returns None.
@@ -106,23 +117,24 @@ class MessageUpdater(commands.Cog):
             await channel.send(content=updatedContent, file=discord.File(IMAGE_PATH))
 
     @commands.command(name="modificar")
-    async def modifyMessage(self, context: commands.Context, days: int) -> None:
+    async def modifyMessage(self, context: commands.Context, *args: str) -> None:
         """
-        :param days: Positive or 0 only.
+        :param args: days: str. Castable to int and greater or equal to zero only.
         :param context: unused.
         Modifies the message with the desired day counter by modifying it. If it doesn't exist or the last one isn't
         from Enzo's ID, wipes channel and sends a new one. Meant as a debug command.
         """
-        if days >= 0:
+
+        if len(args) == 1 and isValidDayInput(args[DAYS]):
             channel = self.bot.get_channel(CHANNEL_ID)
             message = await getFirstEnzoMessage(channel)
-            updatedContent = generateUpdatedContent(days)
+            updatedContent = generateUpdatedContent(days := int(args[DAYS]))
             if message and message.author.id == ENZO_BOT_ID:
                 await message.edit(content=updatedContent)
             else:
                 await channel.purge()
                 await channel.send(content=updatedContent, file=discord.File(IMAGE_PATH))
-            self.unixTime -= days * SECONDS_IN_DAY
+            self.unixTime += (getDayCounter(self.unixTime) - days) * SECONDS_IN_DAY
             saveToBinaryFile(BINARY_FILE_PATH, self.unixTime)
 
 
