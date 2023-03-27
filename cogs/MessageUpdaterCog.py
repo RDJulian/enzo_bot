@@ -123,6 +123,7 @@ class MessageUpdater(commands.Cog):
                 await channel.purge()
                 await channel.send(content=updatedContent, file=discord.File(IMAGE_PATH))
             self.unixTime -= days * SECONDS_IN_DAY
+            saveToBinaryFile(BINARY_FILE_PATH, self.unixTime)
 
 
 async def setup(bot: commands.Bot) -> None:
