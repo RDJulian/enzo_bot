@@ -131,5 +131,8 @@ dmypy.json
 # Token
 /token.env
 
+#Binary
+counterInfo.dat
+
 #IDEA
 .idea/
