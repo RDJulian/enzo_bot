@@ -70,19 +70,27 @@ class MessageUpdater(commands.Cog):
         async def updateMessage() -> None:
             """
             Updates the day counting message, adding one to the counter. If it doesn't exist or last message isn't from
-            Enzo, wipes channel and generates a new one.
-            TODO: Inject dependency by passing channel ID. That way, it could work on any channel.
+            Enzo, wipes channel and generates a new one. Logic is the same as self.refreshMessage(), so it just recalls.
+            TODO: Try to inject dependency by passing channel ID. That way, it could maybe work on any channel.
             """
-            channel = self.bot.get_channel(CHANNEL_ID)
-            message = await getFirstEnzoMessage(channel)
-            updatedContent = generateUpdatedContent(getDayCounter(self.unixTime))
-            if message and message.author.id == ENZO_BOT_ID:
-                await message.edit(content=updatedContent)
-            else:
-                await channel.purge()
-                await channel.send(content=updatedContent, file=discord.File(IMAGE_PATH))
+            await self.refreshMessage()
 
         return updateMessage
+
+    @commands.Cog.listener(name="on_ready")
+    async def refreshMessage(self) -> None:
+        """
+        Refreshes the message by modifying it. It's content may not change. If it doesn't exist or the last one isn't
+        from Enzo's ID, wipes channel and sends a new one.
+        """
+        channel = self.bot.get_channel(CHANNEL_ID)
+        message = await getFirstEnzoMessage(channel)
+        updatedContent = generateUpdatedContent(getDayCounter(self.unixTime))
+        if message and message.author.id == ENZO_BOT_ID:
+            await message.edit(content=updatedContent)
+        else:
+            await channel.purge()
+            await channel.send(content=updatedContent, file=discord.File(IMAGE_PATH))
 
     @commands.command(name="reiniciar")
     async def resetMessage(self, context: commands.Context) -> None:
@@ -101,20 +109,12 @@ class MessageUpdater(commands.Cog):
         self.updateLoopTime(int(time.time()))
 
     @commands.command(name="refrescar")
-    async def refreshMessage(self, context: commands.Context) -> None:
+    async def refreshMessageCommand(self, context: commands.Context) -> None:
         """
         :param context: unused.
-        Refreshes the message by modifying it. It's content may not change. If it doesn't exist or the last one isn't
-        from Enzo's ID, wipes channel and sends a new one.
+        Simply recalls self.refreshMessage(). This avoids repeated code.
         """
-        channel = self.bot.get_channel(CHANNEL_ID)
-        message = await getFirstEnzoMessage(channel)
-        updatedContent = generateUpdatedContent(getDayCounter(self.unixTime))
-        if message and message.author.id == ENZO_BOT_ID:
-            await message.edit(content=updatedContent)
-        else:
-            await channel.purge()
-            await channel.send(content=updatedContent, file=discord.File(IMAGE_PATH))
+        await self.refreshMessage()
 
     @commands.command(name="modificar")
     async def modifyMessage(self, context: commands.Context, *args: str) -> None:
