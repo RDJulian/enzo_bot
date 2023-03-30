@@ -3,12 +3,13 @@ from discord.ext import commands
 from constants import *
 
 
-def isEnzoMentioned(content: str) -> bool:
+def isKeywordMentioned(content: str, keyword: str) -> bool:
     """
+    :param keyword:
     :param content: Content from a discord.Message.
     Returns True if the content contains KEYWORD, ignoring uppercase characters. False otherwise.
     """
-    return True if content.lower().find(KEYWORD) != ERROR else False
+    return True if content.lower().find(keyword) != ERROR else False
 
 
 class OnMessageCog(commands.Cog):
@@ -23,8 +24,10 @@ class OnMessageCog(commands.Cog):
         if message.author.id != ENZO_BOT_ID:
             if message.channel.id == CHANNEL_ID:
                 await message.delete()
-            elif isEnzoMentioned(message.content):
+            elif isKeywordMentioned(message.content, "enzo"):
                 await message.channel.send(content=RESPONSE_TEXT)
+            elif isKeywordMentioned(message.content, "huh"):
+                await message.channel.send(file=discord.File("HUH.png"))
 
 
 async def setup(bot: commands.Bot) -> None:

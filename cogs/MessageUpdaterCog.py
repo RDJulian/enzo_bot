@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime, time, timezone
 import time
 import discord
 from discord.ext import tasks, commands
@@ -11,13 +11,12 @@ def isValidDayInput(days: str) -> bool:
     Returns True if the input text is valid i.e. can be cast to int and greater or equal to zero. False otherwise.
     """
     try:
-        days = int(days)
-        return days >= 0
+        return int(days) >= 0
     except ValueError:
         return False
 
 
-async def getFirstEnzoMessage(channel: discord.TextChannel) -> discord.Message | None:
+async def fetchFirstEnzoMessage(channel: discord.TextChannel) -> discord.Message | None:
     """
     Returns the first message from the desired channel if it is from Enzo. Otherwise, returns None.
     """
@@ -34,9 +33,9 @@ def generateUpdatedContent(days: int) -> str:
 
 def convertUnixToTime(unixTime: int) -> datetime.time:
     """
-    Converts unixTime to time object i.e. without date and returns it.
+    Converts unixTime to time object i.e. without date and returns it. Offsets to UTC.
     """
-    return datetime.datetime.fromtimestamp(unixTime).time()
+    return datetime.fromtimestamp(unixTime, timezone.utc).time()
 
 
 def getDayCounter(unixTime: int) -> int:
@@ -46,11 +45,34 @@ def getDayCounter(unixTime: int) -> int:
     return int((time.time() - unixTime) / SECONDS_IN_DAY)
 
 
+def isValidHourInput(*hour: str) -> bool:
+    try:
+        valid = True
+        i = 0
+        while i < len(hour) and valid:
+            valid = (0 <= int(hour[i]) <= MAX_TIME[i])
+            i += 1
+        return valid
+    except ValueError:
+        return False
+
+
+def generateUpdatedHour(*hour: str) -> int:
+    i = 0
+    seconds = 0
+    while i < len(hour):
+        seconds += int(hour[i]) * TIME_IN_SECONDS[i]
+        i += 1
+    return seconds
+
+
+# TODO: Complete documentation.
 class MessageUpdater(commands.Cog):
-    def __init__(self, bot: commands.Bot, unixTime: int) -> None:
+    def __init__(self, bot: commands.Bot, unixTime: int, channelID: int) -> None:
         self.bot = bot
+        self.channelID = channelID
         self.unixTime = unixTime
-        self.loop = self.loadLoop(convertUnixToTime(self.unixTime + TIMEZONE)).start()
+        self.loop = self.loadLoop(convertUnixToTime(self.unixTime)).start()
 
     def updateLoopTime(self, unixTime: int) -> None:
         """
@@ -58,8 +80,8 @@ class MessageUpdater(commands.Cog):
         """
         self.loop.cancel()
         self.unixTime = unixTime
-        self.loop = self.loadLoop(convertUnixToTime(self.unixTime + TIMEZONE)).start()
-        saveToBinaryFile(BINARY_FILE_PATH, unixTime)
+        self.loop = self.loadLoop(convertUnixToTime(self.unixTime)).start()
+        saveToBinaryFile(BINARY_FILE_PATH, self.unixTime)
 
     def loadLoop(self, loopTime: datetime.time) -> callable:
         """
@@ -71,7 +93,6 @@ class MessageUpdater(commands.Cog):
             """
             Updates the day counting message, adding one to the counter. If it doesn't exist or last message isn't from
             Enzo, wipes channel and generates a new one. Logic is the same as self.refreshMessage(), so it just recalls.
-            TODO: Try to inject dependency by passing channel ID. That way, it could maybe work on any channel.
             """
             await self.refreshMessage()
 
@@ -83,8 +104,8 @@ class MessageUpdater(commands.Cog):
         Refreshes the message by modifying it. It's content may not change. If it doesn't exist or the last one isn't
         from Enzo's ID, wipes channel and sends a new one.
         """
-        channel = self.bot.get_channel(CHANNEL_ID)
-        message = await getFirstEnzoMessage(channel)
+        channel = self.bot.get_channel(self.channelID)
+        message = await fetchFirstEnzoMessage(channel)
         updatedContent = generateUpdatedContent(getDayCounter(self.unixTime))
         if message and message.author.id == ENZO_BOT_ID:
             await message.edit(content=updatedContent)
@@ -99,14 +120,8 @@ class MessageUpdater(commands.Cog):
         Resets the message to INITIAL_MESSAGE by modifying it. If it doesn't exist or the last one isn't from Enzo's ID,
         wipes channel and sends a new one.
         """
-        channel = self.bot.get_channel(CHANNEL_ID)
-        message = await getFirstEnzoMessage(channel)
-        if message and message.author.id == ENZO_BOT_ID:
-            await message.edit(content=INITIAL_MESSAGE)
-        else:
-            await channel.purge()
-            await channel.send(content=INITIAL_MESSAGE, file=discord.File(IMAGE_PATH))
         self.updateLoopTime(int(time.time()))
+        await self.refreshMessage()
 
     @commands.command(name="refrescar")
     async def refreshMessageCommand(self, context: commands.Context) -> None:
@@ -116,26 +131,25 @@ class MessageUpdater(commands.Cog):
         """
         await self.refreshMessage()
 
-    @commands.command(name="modificar")
-    async def modifyMessage(self, context: commands.Context, *args: str) -> None:
+    @commands.command(name="modificar_dias")
+    async def modifyDays(self, context: commands.Context, *args: str) -> None:
         """
         :param args: days: str. Castable to int and greater or equal to zero only.
         :param context: unused.
         Modifies the message with the desired day counter by modifying it. If it doesn't exist or the last one isn't
         from Enzo's ID, wipes channel and sends a new one. Meant as a debug command.
         """
-
         if len(args) == 1 and isValidDayInput(args[DAYS]):
-            channel = self.bot.get_channel(CHANNEL_ID)
-            message = await getFirstEnzoMessage(channel)
-            updatedContent = generateUpdatedContent(days := int(args[DAYS]))
-            if message and message.author.id == ENZO_BOT_ID:
-                await message.edit(content=updatedContent)
-            else:
-                await channel.purge()
-                await channel.send(content=updatedContent, file=discord.File(IMAGE_PATH))
-            self.unixTime += (getDayCounter(self.unixTime) - days) * SECONDS_IN_DAY
+            self.unixTime += (getDayCounter(self.unixTime) - int(args[DAYS])) * SECONDS_IN_DAY
             saveToBinaryFile(BINARY_FILE_PATH, self.unixTime)
+            await self.refreshMessage()
+
+    @commands.command(name="modificar_hora")
+    async def modifyHour(self, context: commands.Context, *args: str) -> None:
+        if 1 <= len(args) <= 3 and isValidHourInput(*args):
+            updatedHour = generateUpdatedHour(*args)
+            self.updateLoopTime(self.unixTime - (self.unixTime + TIMEZONE) % SECONDS_IN_DAY + updatedHour)
+            await self.refreshMessage()
 
 
 async def setup(bot: commands.Bot) -> None:
@@ -143,4 +157,4 @@ async def setup(bot: commands.Bot) -> None:
     Initializes and adds Cog to Bot.
     """
     unixTime = loadBinaryFile(BINARY_FILE_PATH)
-    await bot.add_cog(MessageUpdater(bot, unixTime))
+    await bot.add_cog(MessageUpdater(bot, unixTime, CHANNEL_ID))

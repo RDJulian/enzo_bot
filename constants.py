@@ -17,17 +17,19 @@ MESSAGE_SECOND_HALF = f"** día(s) desde el último accidente."
 ACTIVITY_NAME = "el Pepe"
 
 RESPONSE_TEXT = "Yo"
-KEYWORD = "enzo"
 
 IMAGE_PATH = "sirius_black.png"
 BINARY_FILE_PATH = "counterInfo.dat"
 
-COGS = ["cogs.MessageUpdaterCog", "cogs.OnMessageCog", "cogs.OnMessageDeleteCog", "cogs.OnReadyCog"]
+COGS = ["cogs.MessageUpdaterCog", "cogs.OnMessageCog", "cogs.OnMessageDeleteCog", "cogs.OnStartupCog"]
 
 SEARCH_LIMIT = 1
 ERROR = -1
 
 SECONDS_IN_DAY = 86400
-TIMEZONE = 10800
+TIMEZONE = -10800
 
 DAYS = 0
+
+MAX_TIME = [23, 59, 59]
+TIME_IN_SECONDS = [3600, 60, 1]
