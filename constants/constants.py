@@ -1,8 +1,11 @@
-ENZO_BOT_ID = 1088840765922357321
-CHANNEL_ID = 1085766254402474106
-ORURA_ID = 1060022152696451082
+from os import getenv
+from dotenv import load_dotenv
 
-COMMAND_PREFIX = "!"
+load_dotenv('tokens.env')
+TOKEN = getenv('TOKEN')
+ORURA_ID = int(getenv('ORURA_ID'))
+ENZO_BOT_ID = int(getenv('ENZO_BOT_ID'))
+CHANNEL_ID = int(getenv('CHANNEL_ID'))
 
 INITIAL_MESSAGE = f'El "Dia del Accidente" es cuando a <@{ORURA_ID}> le da o se pelea con alguien y ' \
                   'semi-borra usuarios del server porque esta enojada/triste/retrasada mental.\n\nActualmente ' \
@@ -14,14 +17,11 @@ MESSAGE_FIRST_HALF = f'El "Dia del Accidente" es cuando a <@{ORURA_ID}> le da o 
 
 MESSAGE_SECOND_HALF = f"** día(s) desde el último accidente."
 
-ACTIVITY_NAME = "el Pepe"
-
 RESPONSE_TEXT = "Yo"
 
-IMAGE_PATH = "sirius_black.png"
-BINARY_FILE_PATH = "counterInfo.dat"
-
-COGS = ["cogs.MessageUpdaterCog", "cogs.OnMessageCog", "cogs.OnMessageDeleteCog", "cogs.OnStartupCog"]
+IMAGE_PATH = "images/sirius_black.png"
+DAY_COUNTER_BINARY_PATH = "binary/counterInfo.dat"
+KEYWORD_COUNTER_BINARY_PATH = "binary/keywordCounter.dat"
 
 SEARCH_LIMIT = 1
 ERROR = -1
@@ -33,3 +33,5 @@ DAYS = 0
 
 MAX_TIME = [23, 59, 59]
 TIME_IN_SECONDS = [3600, 60, 1]
+
+# SACAR DE ACA A MARTIN

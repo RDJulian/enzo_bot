@@ -1,9 +1,9 @@
-from datetime import datetime, time, timezone
-import time
 import discord
-from discord.ext import tasks, commands
+from datetime import datetime, time, timezone
+from time import time
+from discord.ext import commands, tasks
 from binaryFileHandler import loadBinaryFile, saveToBinaryFile
-from constants import *
+from constants.constants import *
 
 
 def isValidDayInput(days: str) -> bool:
@@ -42,7 +42,7 @@ def getDayCounter(unixTime: int) -> int:
     """
     Calculates difference between current and saved time, rounded in days, and returns it.
     """
-    return int((time.time() - unixTime) / SECONDS_IN_DAY)
+    return int((time() - unixTime) / SECONDS_IN_DAY)
 
 
 def isValidHourInput(*hour: str) -> bool:
@@ -68,9 +68,8 @@ def generateUpdatedHour(*hour: str) -> int:
 
 # TODO: Complete documentation.
 class MessageUpdater(commands.Cog):
-    def __init__(self, bot: commands.Bot, unixTime: int, channelID: int) -> None:
+    def __init__(self, bot: commands.Bot, unixTime: int) -> None:
         self.bot = bot
-        self.channelID = channelID
         self.unixTime = unixTime
         self.loop = self.loadLoop(convertUnixToTime(self.unixTime)).start()
 
@@ -81,7 +80,7 @@ class MessageUpdater(commands.Cog):
         self.loop.cancel()
         self.unixTime = unixTime
         self.loop = self.loadLoop(convertUnixToTime(self.unixTime)).start()
-        saveToBinaryFile(BINARY_FILE_PATH, self.unixTime)
+        saveToBinaryFile(DAY_COUNTER_BINARY_PATH, self.unixTime)
 
     def loadLoop(self, loopTime: datetime.time) -> callable:
         """
@@ -104,7 +103,7 @@ class MessageUpdater(commands.Cog):
         Refreshes the message by modifying it. It's content may not change. If it doesn't exist or the last one isn't
         from Enzo's ID, wipes channel and sends a new one.
         """
-        channel = self.bot.get_channel(self.channelID)
+        channel = self.bot.get_channel(CHANNEL_ID)
         message = await fetchFirstEnzoMessage(channel)
         updatedContent = generateUpdatedContent(getDayCounter(self.unixTime))
         if message and message.author.id == ENZO_BOT_ID:
@@ -120,7 +119,7 @@ class MessageUpdater(commands.Cog):
         Resets the message to INITIAL_MESSAGE by modifying it. If it doesn't exist or the last one isn't from Enzo's ID,
         wipes channel and sends a new one.
         """
-        self.updateLoopTime(int(time.time()))
+        self.updateLoopTime(int(time()))
         await self.refreshMessage()
 
     @commands.command(name="refrescar")
@@ -141,7 +140,7 @@ class MessageUpdater(commands.Cog):
         """
         if len(args) == 1 and isValidDayInput(args[DAYS]):
             self.unixTime += (getDayCounter(self.unixTime) - int(args[DAYS])) * SECONDS_IN_DAY
-            saveToBinaryFile(BINARY_FILE_PATH, self.unixTime)
+            saveToBinaryFile(DAY_COUNTER_BINARY_PATH, self.unixTime)
             await self.refreshMessage()
 
     @commands.command(name="modificar_hora")
@@ -151,10 +150,24 @@ class MessageUpdater(commands.Cog):
             self.updateLoopTime(self.unixTime - (self.unixTime + TIMEZONE) % SECONDS_IN_DAY + updatedHour)
             await self.refreshMessage()
 
+    @commands.Cog.listener(name="on_message_delete")
+    async def restoreMessage(self, message: discord.Message) -> None:
+        """
+        Restores Enzo's message if it was deleted.
+        TODO: Search if it's possible to reuse the attached image. It would make this command more generic.
+            Also consider if injecting dependency would be better.
+        """
+        if message.author.id == ENZO_BOT_ID and message.channel.id == CHANNEL_ID:
+            await self.bot.get_channel(message.channel.id).send(content=message.content,
+                                                                file=discord.File(IMAGE_PATH))
+
 
 async def setup(bot: commands.Bot) -> None:
     """
     Initializes and adds Cog to Bot.
     """
-    unixTime = loadBinaryFile(BINARY_FILE_PATH)
-    await bot.add_cog(MessageUpdater(bot, unixTime, CHANNEL_ID))
+    unixTime = loadBinaryFile(DAY_COUNTER_BINARY_PATH)
+    load_dotenv('token.env')
+    if not unixTime:
+        unixTime = int(time())
+    await bot.add_cog(MessageUpdater(bot, unixTime))

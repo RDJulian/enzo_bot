@@ -1,9 +1,9 @@
 from os import path
 from pickle import load, dump
-import time
+from typing import Any
 
 
-def readBinaryFile(filePath: str) -> int:
+def readBinaryFile(filePath: str) -> Any | None:
     """
     :param filePath: Path to binary file.
     Returns Unix time saved in binary file, rounded to seconds.
@@ -13,7 +13,7 @@ def readBinaryFile(filePath: str) -> int:
     return resetTime
 
 
-def saveToBinaryFile(filePath: str, resetTime: int) -> None:
+def saveToBinaryFile(filePath: str, resetTime: Any | None) -> None:
     """
     :param filePath: Path to binary file.
     :param resetTime: Unix timestamp rounded to seconds.
@@ -23,7 +23,7 @@ def saveToBinaryFile(filePath: str, resetTime: int) -> None:
         dump(resetTime, file)
 
 
-def loadBinaryFile(filePath: str) -> int:
+def loadBinaryFile(filePath: str) -> Any | None:
     """
     :param filePath: Path to binary file.
     Loads binary file and returns Unix time stored in it. If the file doesn't exist, creates a new one at specified path
@@ -32,6 +32,5 @@ def loadBinaryFile(filePath: str) -> int:
     if path.isfile(filePath):
         return readBinaryFile(filePath)
     else:
-        resetTime = int(time.time())
-        saveToBinaryFile(filePath, resetTime)
-        return resetTime
+        saveToBinaryFile(filePath, None)
+        return None

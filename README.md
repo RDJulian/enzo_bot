@@ -1,7 +1,7 @@
 # EnzoBot
 
 <p align="center">
-  <img width="50%" height="50%" src="sirius_black.png" alt="La gorda matosa"><br>
+  <img width="50%" height="50%" src="images/sirius_black.png" alt="La gorda matosa"><br>
 Simple Discord Bot for counting days since "The Accident"
 </p>
 

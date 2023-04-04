@@ -1,26 +1,30 @@
-import asyncio
-import os
-from dotenv import load_dotenv
 import discord
+from os import listdir
+from asyncio import run
 from discord.ext import commands
-from constants import *
+from constants.constants import TOKEN
+
+COMMAND_PREFIX = "!"
+COGS_DIR = "cogs/"
 
 
-async def loadCogs(bot: commands.Bot):
+async def loadCogs(bot: commands.Bot) -> None:
     """
-    Loads all cogs to the bot.
+    :param bot: A Discord commands.Bot.
+    :return: None.
+    Loads all Cogs in COGS_DIR to the bot.
     """
-    for cog in COGS:
-        await bot.load_extension(cog)
+    cogs = listdir(COGS_DIR)
+    for file in cogs:
+        if file.endswith(".py"):
+            cogName = file[:-3]
+            await bot.load_extension(f"cogs.{cogName}")
 
-
-load_dotenv('token.env')
-TOKEN = os.getenv('TOKEN')
 
 intents = discord.Intents.default()
 intents.message_content = True
 intents.messages = True
 enzoBot = commands.Bot(intents=intents, command_prefix=COMMAND_PREFIX)
 
-asyncio.run(loadCogs(enzoBot))
+run(loadCogs(enzoBot))
 enzoBot.run(TOKEN)
