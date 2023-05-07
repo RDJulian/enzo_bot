@@ -1,10 +1,11 @@
 import discord
 from discord.ext import commands
 from binaryFileHandler import saveToBinaryFile, loadBinaryFile
-from constants.constants import ENZO_BOT_ID, CHANNEL_ID
+from constants.constants import ENZO_BOT_ID, RESERVED_CHANNEL_ID
 from constants.keywordCounterConstants import *
 
 KEYWORD_COUNTER_BINARY_PATH = "binary/keywordCounter.dat"
+BANNED_CHANNELS = [RESERVED_CHANNEL_ID]
 DATA_FIELDS = 2
 KEYWORDS = 0
 SORTED = 1
@@ -52,7 +53,7 @@ class KeywordCounterCog(commands.Cog):
 
     @commands.command(name=SHOW_KEYWORDS_COMMAND)
     async def showKeywords(self, context: commands.Context) -> None:
-        if not context.channel.id == CHANNEL_ID:
+        if context.channel.id not in BANNED_CHANNELS:
             self.sortKeywords()
             output = self.generateOutputText()
             if output:

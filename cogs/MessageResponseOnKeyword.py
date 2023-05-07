@@ -1,18 +1,10 @@
 import discord
 from discord.ext import commands
-from constants.constants import ENZO_BOT_ID, CHANNEL_ID
+from constants.constants import ENZO_BOT_ID, RESERVED_CHANNEL_ID
 
 RESPONSE_TEXT = "Yo"
 HUH_IMAGE_PATH = "images/huh.png"
-
-
-async def deleteMessageOnChannel(message: discord.Message) -> None:
-    """
-    :param message: A discord Message.
-    Deletes message if it was sent in desired CHANNEL_ID
-    """
-    if message.channel.id == CHANNEL_ID:
-        await message.delete()
+BANNED_CHANNELS = [RESERVED_CHANNEL_ID]
 
 
 async def responseOnEnzo(message: discord.Message) -> None:
@@ -56,8 +48,7 @@ class OnMessageCog(commands.Cog):
         :param message: A discord Message.
         Executes different actions based on channnel ID and message content.
         """
-        if message.author.id != ENZO_BOT_ID:
-            await deleteMessageOnChannel(message)
+        if message.author.id != ENZO_BOT_ID and message.channel.id not in BANNED_CHANNELS:
             foundKeywords = self.findKeywords(message.content)
             for keyword in foundKeywords:
                 await self.responseTable[keyword](message)
