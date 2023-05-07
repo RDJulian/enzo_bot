@@ -132,7 +132,7 @@ dmypy.json
 tokens.env
 
 # Binary
-*.dat
+binary/*.dat
 
 # IDEA
 .idea/
@@ -144,4 +144,4 @@ tokens.env
 /images/*.gif
 
 # Keywords
-constants/keywordConstants.py
+constants/keywordCounterConstants.py

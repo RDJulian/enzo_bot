@@ -6,6 +6,9 @@ ACTIVITY_NAME = "el Pepe"
 
 class Startup(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
+        """
+        :param bot: A Discord commands.Bot.
+        """
         self.bot = bot
 
     @commands.Cog.listener(name="on_ready")
@@ -18,6 +21,7 @@ class Startup(commands.Cog):
 
 async def setup(bot: commands.Bot) -> None:
     """
+    :param bot: A Discord commands.Bot.
     Initializes and adds Cog to Bot.
     """
     await bot.add_cog(Startup(bot))

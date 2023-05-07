@@ -8,6 +8,8 @@ COMMAND_PREFIX = "!"
 COGS_DIR = "cogs/"
 
 
+# This should be wrapped in a function/class but works for now.
+
 async def loadCogs(bot: commands.Bot) -> None:
     """
     :param bot: A Discord commands.Bot.
@@ -24,7 +26,7 @@ async def loadCogs(bot: commands.Bot) -> None:
 intents = discord.Intents.default()
 intents.message_content = True
 intents.messages = True
-enzoBot = commands.Bot(intents=intents, command_prefix=COMMAND_PREFIX)
 
+enzoBot = commands.Bot(intents=intents, command_prefix=COMMAND_PREFIX)
 run(loadCogs(enzoBot))
 enzoBot.run(TOKEN)

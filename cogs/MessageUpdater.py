@@ -110,7 +110,7 @@ class MessageUpdater(commands.Cog):
             await message.edit(content=updatedContent)
         else:
             await channel.purge()
-            await channel.send(content=updatedContent, file=discord.File(IMAGE_PATH))
+            await channel.send(content=updatedContent, file=discord.File(SIRIUS_IMAGE_PATH))
 
     @commands.command(name="reiniciar")
     async def resetMessage(self, context: commands.Context) -> None:
@@ -159,7 +159,7 @@ class MessageUpdater(commands.Cog):
         """
         if message.author.id == ENZO_BOT_ID and message.channel.id == CHANNEL_ID:
             await self.bot.get_channel(message.channel.id).send(content=message.content,
-                                                                file=discord.File(IMAGE_PATH))
+                                                                file=discord.File(SIRIUS_IMAGE_PATH))
 
 
 async def setup(bot: commands.Bot) -> None:
