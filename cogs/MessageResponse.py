@@ -23,7 +23,7 @@ async def responseOnHuh(message: discord.Message) -> None:
     await message.channel.send(file=discord.File(HUH_IMAGE_PATH))
 
 
-class OnMessageCog(commands.Cog):
+class MessageResponse(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
         """
         :param bot: A Discord commands.Bot.
@@ -59,4 +59,4 @@ async def setup(bot: commands.Bot) -> None:
     :param bot: A Discord commands.Bot.
     Initializes and adds Cog to Bot.
     """
-    await bot.add_cog(OnMessageCog(bot))
+    await bot.add_cog(MessageResponse(bot))

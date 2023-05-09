@@ -28,7 +28,7 @@ def searchNewKeywords(content: str) -> str:
             i += 1
 
 
-class KeywordCounterCog(commands.Cog):
+class KeywordCounter(commands.Cog):
     def __init__(self, bot: commands.Bot, keywords: dict, isSorted: bool) -> None:
         """
         :param bot: A Discord commands.Bot.
@@ -119,4 +119,4 @@ async def setup(bot: commands.Bot) -> None:
     else:
         keywords = INITIAL_KEYWORD_COUNTER
         isSorted = False
-    await bot.add_cog(KeywordCounterCog(bot, keywords, isSorted))
+    await bot.add_cog(KeywordCounter(bot, keywords, isSorted))
