@@ -46,7 +46,7 @@ class OnMessageCog(commands.Cog):
     async def responseOnKeyword(self, message: discord.Message) -> None:
         """
         :param message: A discord Message.
-        Executes different actions based on channnel ID and message content.
+        Executes different actions based on channel ID and message content.
         """
         if message.author.id != ENZO_BOT_ID and message.channel.id not in BANNED_CHANNELS:
             foundKeywords = self.findKeywords(message.content)

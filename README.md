@@ -5,11 +5,18 @@
 Simple Discord Bot for counting days since "The Accident"
 </p>
 
-It's sole purpose is to update once a day a specific message in a Discord server, adding one to the day counter.
-It supports three commands:
+## Version 2.0 Patch Notes
 
-1. !reiniciar - Resets message.
-2. !modificar (arg1) - Modifies message, replacing day counter with arg1.
-3. !refrescar - Refreshes message.
+Enzo now counts with 3 main modules:
 
-It also answers to his name in any channel, and has basic case and error handling.
+1. Keyword Counter: Enzo will read all messages and try to match all words to a predetermined set of words. If any is
+   mentioned, Enzo will add one to it's counter. All words can be displayed in descending count order with a command.
+   This set of words can grow if given specified triggers (i.e. pup will add puppy to the set).
+2. Response on Keyword: Enzo will respond in a specified way when it matches words to keywords, similar to Keyword
+   Counter functionality.
+3. Accident Day Message Updater: Enzo will automatically modify the Accident Message every day at a fixed time. This
+   timer can be manually manipulated via 5 commands:
+    1. !refrescar: Refreshes the message.
+    2. !reiniciar: Resets the message.
+    3. !modificar_hora: Modifies the update time.
+    4. !modificar_dias: Modifies the day counter.
